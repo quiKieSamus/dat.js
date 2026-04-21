@@ -1,5 +1,5 @@
 {
-  "name": "@quikiesamus/dat.js",
+  "name": "@quikiesamus/datjs",
   "version": "1.0.0",
   "exports": "./main.ts",
   "nodeModulesDir": "auto",
