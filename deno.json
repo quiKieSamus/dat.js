@@ -1,5 +1,9 @@
 {
+  "name": "@quikiesamus/dat.js",
+  "version": "1.0.0",
+  "exports": "./main.ts",
   "nodeModulesDir": "auto",
+  "license": "WTFPL",
   "imports": {
     "@/": "./"
   }
