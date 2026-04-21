@@ -1,10 +1,11 @@
 {
   "name": "@quikiesamus/datjs",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "exports": "./main.ts",
   "nodeModulesDir": "auto",
   "license": "WTFPL",
   "imports": {
     "@/": "./"
-  }
+  },
+  "description": "Lightweight Deno library for building fixed and variable length .dat files and binary buffers."
 }
