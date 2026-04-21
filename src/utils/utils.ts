@@ -44,6 +44,3 @@ export function buildVarLengthBuffer(entries: IDatEntryVarLength[], options: Dat
 
     return Buffer.concat(buffers);
 }
-
-console.log(buildFixedSizedBuffer([{ size: 100, value: "La cocina rota de mama" }], { encoding: "latin1" }).toString("latin1"));
-console.log(buildVarLengthBuffer([{ value: "Hola como estas loca" }], {encoding: "base64url"}).toString("base64url"));
