@@ -16,7 +16,7 @@ export class Datjs {
      * @param options - Configuration option for the text encoding (defaults to "utf-8").
      * @returns A Promise resolving to true if file writing succeeded, or false if an error occurred.
      */
-    static async buildFixedSizedDatFile(entries: IDatEntryFixed[], path: PathLike, options: DatOptions = { encoding: "utf-8" }): Promise<boolean> {
+    static async buildFixedSizedDatFile(entries: IDatEntryFixed[], path: PathLike, options: DatOptions = { encoding: "utf-8", endianness: "LE" }): Promise<boolean> {
         try {
             const datBuffer = buildFixedSizedBuffer(entries, options);
             await writeFile(path, datBuffer);
@@ -35,7 +35,7 @@ export class Datjs {
      * @param options - Configuration option for the text encoding (defaults to "utf-8").
      * @returns A Promise resolving to true if file writing succeeded, or false if an error occurred.
      */
-    static async buildVarLengthDatFile(entries: IDatEntryVarLength[], path: PathLike, options: DatOptions = { encoding: "utf-8" }): Promise<boolean> {
+    static async buildVarLengthDatFile(entries: IDatEntryVarLength[], path: PathLike, options: DatOptions = { encoding: "utf-8", endianness: "LE" }): Promise<boolean> {
         try {
             const datBuffer = buildVarLengthBuffer(entries, options);
             await writeFile(path, datBuffer);

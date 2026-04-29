@@ -10,11 +10,13 @@ import { DatOptions, IDatEntryFixed, IDatEntryVarLength } from "@/types.ts";
  * @param options - Encoding options (defaults to "utf8").
  * @returns A concatenated Buffer of all fixed-size entries.
  */
-export function buildFixedSizedBuffer(entries: IDatEntryFixed[], options: DatOptions = { encoding: "utf8", endianness: "BE" }): Buffer {
+export function buildFixedSizedBuffer(entries: IDatEntryFixed[], options: DatOptions = { encoding: "utf8", endianness: "LE" }): Buffer {
     const { encoding } = options;
     const buffers = entries.map((entry) => {
         const value = entry.value;
-        
+        const type = entry.type;
+
+
         if (value.length > entry.size) return Buffer.from(value.substring(0, entry.size), encoding);
         return Buffer.from(value.padEnd(entry.size, ' '));
     });
@@ -29,7 +31,7 @@ export function buildFixedSizedBuffer(entries: IDatEntryFixed[], options: DatOpt
  * @param options - Encoding options (defaults to "utf8").
  * @returns A concatenated Buffer of all records including their size prefixes.
  */
-export function buildVarLengthBuffer(entries: IDatEntryVarLength[], options: DatOptions = { encoding: "utf8", endianness: "BE" }): Buffer {
+export function buildVarLengthBuffer(entries: IDatEntryVarLength[], options: DatOptions = { encoding: "utf8", endianness: "LE" }): Buffer {
     const { encoding } = options;
     const buffers: Buffer[] = [];
     entries.forEach((entry) => {
