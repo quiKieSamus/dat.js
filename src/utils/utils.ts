@@ -16,6 +16,8 @@ export function buildFixedSizedBuffer(entries: IDatEntryFixed[], options: DatOpt
         const value = entry.value;
         const type = entry.type;
 
+        if (type === "int") return Buffer.from(new Int16Array([Number(value)]).buffer);
+        if (type === "double") return Buffer.from(new Float64Array([Number(value)]).buffer);
 
         if (value.length > entry.size) return Buffer.from(value.substring(0, entry.size), encoding);
         return Buffer.from(value.padEnd(entry.size, ' '));
