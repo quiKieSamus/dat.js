@@ -1,6 +1,6 @@
 {
   "name": "@quikiesamus/datjs",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "exports": "./main.ts",
   "tasks": {
     "test": "deno run --allow-read --allow-write test.ts"
