@@ -1,6 +1,6 @@
 import { EncodingOption } from "node:fs";
 
-export type DatDataTypes = "string" | "double" | "int" | "date";
+export type DatDataTypes = "string" | "double" | "int" | "date" | "vb6date";
 
 /**
  * Represents a fixed-length entry for binary records.

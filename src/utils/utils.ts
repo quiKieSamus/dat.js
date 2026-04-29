@@ -54,8 +54,18 @@ export function buildFixedSizedBuffer(entries: IDatEntryFixed[], options: DatOpt
             return buf;
         }
 
+        if (type === "vb6date") {
+            const buf = Buffer.alloc(8);
+            const time = new Date(value).getTime();
+            const vb6Epoch = Date.UTC(1899, 11, 30);
+            const oaDate = (time - vb6Epoch) / (24 * 60 * 60 * 1000);
+            if (endianness === "BE") buf.writeDoubleBE(oaDate, 0);
+            else buf.writeDoubleLE(oaDate, 0);
+            return buf;
+        }
+
         if (value.length > size) return Buffer.from(value.substring(0, size), encoding);
-        return Buffer.from(value.padEnd(size, ' '));
+        return Buffer.from(value.padEnd(size, ' '), encoding);
     });
     return Buffer.concat(buffers);
 }
@@ -88,6 +98,13 @@ export function buildVarLengthBuffer(entries: IDatEntryVarLength[], options: Dat
             const time = new Date(value).getTime();
             if (endianness === "BE") valueBuf.writeBigInt64BE(BigInt(time), 0);
             else valueBuf.writeBigInt64LE(BigInt(time), 0);
+        } else if (type === "vb6date") {
+            valueBuf = Buffer.alloc(8);
+            const time = new Date(value).getTime();
+            const vb6Epoch = Date.UTC(1899, 11, 30);
+            const oaDate = (time - vb6Epoch) / (24 * 60 * 60 * 1000);
+            if (endianness === "BE") valueBuf.writeDoubleBE(oaDate, 0);
+            else valueBuf.writeDoubleLE(oaDate, 0);
         } else {
             valueBuf = Buffer.from(value, encoding);
         }
