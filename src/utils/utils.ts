@@ -11,16 +11,51 @@ import { DatOptions, IDatEntryFixed, IDatEntryVarLength } from "@/types.ts";
  * @returns A concatenated Buffer of all fixed-size entries.
  */
 export function buildFixedSizedBuffer(entries: IDatEntryFixed[], options: DatOptions = { encoding: "utf8", endianness: "LE" }): Buffer {
-    const { encoding } = options;
+    const { encoding, endianness } = options;
     const buffers = entries.map((entry) => {
-        const value = entry.value;
-        const type = entry.type;
+        const { value, type, size } = entry;
 
-        if (type === "int") return Buffer.from(new Int16Array([Number(value)]).buffer);
-        if (type === "double") return Buffer.from(new Float64Array([Number(value)]).buffer);
+        if (type === "int") {
+            const buf = Buffer.alloc(size);
+            const num = Number(value);
+            if (size === 8) {
+                if (endianness === "BE") buf.writeBigInt64BE(BigInt(num), 0);
+                else buf.writeBigInt64LE(BigInt(num), 0);
+            } else {
+                if (endianness === "BE") buf.writeIntBE(num, 0, size);
+                else buf.writeIntLE(num, 0, size);
+            }
+            return buf;
+        }
 
-        if (value.length > entry.size) return Buffer.from(value.substring(0, entry.size), encoding);
-        return Buffer.from(value.padEnd(entry.size, ' '));
+        if (type === "double") {
+            const buf = Buffer.alloc(size);
+            const num = Number(value);
+            if (size === 4) {
+                if (endianness === "BE") buf.writeFloatBE(num, 0);
+                else buf.writeFloatLE(num, 0);
+            } else {
+                if (endianness === "BE") buf.writeDoubleBE(num, 0);
+                else buf.writeDoubleLE(num, 0);
+            }
+            return buf;
+        }
+
+        if (type === "date") {
+            const buf = Buffer.alloc(size);
+            const time = new Date(value).getTime();
+            if (size === 8) {
+                if (endianness === "BE") buf.writeBigInt64BE(BigInt(time), 0);
+                else buf.writeBigInt64LE(BigInt(time), 0);
+            } else {
+                if (endianness === "BE") buf.writeIntBE(time, 0, size);
+                else buf.writeIntLE(time, 0, size);
+            }
+            return buf;
+        }
+
+        if (value.length > size) return Buffer.from(value.substring(0, size), encoding);
+        return Buffer.from(value.padEnd(size, ' '));
     });
     return Buffer.concat(buffers);
 }
@@ -34,17 +69,35 @@ export function buildFixedSizedBuffer(entries: IDatEntryFixed[], options: DatOpt
  * @returns A concatenated Buffer of all records including their size prefixes.
  */
 export function buildVarLengthBuffer(entries: IDatEntryVarLength[], options: DatOptions = { encoding: "utf8", endianness: "LE" }): Buffer {
-    const { encoding } = options;
+    const { encoding, endianness } = options;
     const buffers: Buffer[] = [];
     entries.forEach((entry) => {
-        const value = Buffer.from(entry.value, encoding);
-        const length = value.length;
+        let valueBuf: Buffer;
+        const { value, type } = entry;
 
+        if (type === "int") {
+            valueBuf = Buffer.alloc(4);
+            if (endianness === "BE") valueBuf.writeInt32BE(Number(value), 0);
+            else valueBuf.writeInt32LE(Number(value), 0);
+        } else if (type === "double") {
+            valueBuf = Buffer.alloc(8);
+            if (endianness === "BE") valueBuf.writeDoubleBE(Number(value), 0);
+            else valueBuf.writeDoubleLE(Number(value), 0);
+        } else if (type === "date") {
+            valueBuf = Buffer.alloc(8);
+            const time = new Date(value).getTime();
+            if (endianness === "BE") valueBuf.writeBigInt64BE(BigInt(time), 0);
+            else valueBuf.writeBigInt64LE(BigInt(time), 0);
+        } else {
+            valueBuf = Buffer.from(value, encoding);
+        }
+
+        const length = valueBuf.length;
         const lengthPrefix = Buffer.alloc(4);
-        lengthPrefix.writeUInt32BE(length);
+        lengthPrefix.writeUInt32BE(length, 0);
 
         buffers.push(lengthPrefix);
-        buffers.push(value);
+        buffers.push(valueBuf);
     });
 
     return Buffer.concat(buffers);
